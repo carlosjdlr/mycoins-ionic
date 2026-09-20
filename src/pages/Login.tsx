@@ -18,7 +18,7 @@ type LoginPageProps = {
 };
 
 const LoginPage = ({ onLoggedIn }: LoginPageProps): JSX.Element => {
-	const [username, setUsername] = useState('futbolista');
+	const [username, setUsername] = useState('estudiante');
 	const [password, setPassword] = useState('');
 	const [error, setError] = useState<string | null>(null);
 	const [loading, setLoading] = useState(false);
@@ -54,10 +54,16 @@ const LoginPage = ({ onLoggedIn }: LoginPageProps): JSX.Element => {
 					<IonTitle>MyCoins</IonTitle>
 				</IonToolbar>
 			</IonHeader>
-			<IonContent className="ion-padding">
-				<div style={{ marginTop: '2rem' }}>
+			<IonContent className="ion-padding" style={{ '--background': '#f4f7f5' }}>
+				<div style={{ margin: '2.5rem auto 0', maxWidth: '440px' }}>
+					<div style={{ background: '#18332f', borderRadius: '20px 20px 0 0', color: '#fff', padding: '1.5rem 1.35rem 1.7rem' }}>
+						<p style={{ color: '#b9f4d5', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.14em', margin: 0, textTransform: 'uppercase' }}>Espacio personal</p>
+						<h1 style={{ fontSize: '2rem', margin: '0.5rem 0 0.35rem' }}>Tu dinero, más claro.</h1>
+						<p style={{ color: '#d2e3dc', lineHeight: 1.5, margin: 0 }}>Organiza tus cuentas y entiende tus movimientos desde un solo lugar.</p>
+					</div>
+					<div style={{ background: '#fff', borderRadius: '0 0 20px 20px', boxShadow: '0 12px 30px rgba(24, 51, 47, .08)', padding: '1.35rem' }}>
 					<IonText color="medium">
-						<p style={{ fontSize: '0.8rem' }}>API: {API_BASE_URL}</p>
+						<p style={{ fontSize: '0.85rem', margin: '0 0 1.1rem' }}>Inicia sesión para ver tu resumen financiero.</p>
 					</IonText>
 
 					<IonInput
@@ -66,7 +72,8 @@ const LoginPage = ({ onLoggedIn }: LoginPageProps): JSX.Element => {
 						fill="outline"
 						value={username}
 						onIonInput={(e) => setUsername(e.detail.value ?? '')}
-						style={{ marginBottom: '1rem' }}
+						autocomplete="username"
+						style={{ marginBottom: '0.85rem' }}
 					/>
 
 					<IonInput
@@ -76,18 +83,19 @@ const LoginPage = ({ onLoggedIn }: LoginPageProps): JSX.Element => {
 						type="password"
 						value={password}
 						onIonInput={(e) => setPassword(e.detail.value ?? '')}
-						style={{ marginBottom: '1rem' }}
+						autocomplete="current-password"
+						style={{ marginBottom: '0.85rem' }}
 					/>
 
 					{error && (
-						<IonText color="danger">
-							<p>{error}</p>
-						</IonText>
+						<div style={{ background: '#fff1ed', borderRadius: '8px', color: '#a44835', fontSize: '0.85rem', marginBottom: '0.85rem', padding: '0.75rem' }}>{error}</div>
 					)}
 
-					<IonButton expand="block" onClick={handleSubmit} disabled={loading}>
+					<IonButton expand="block" shape="round" onClick={handleSubmit} disabled={loading}>
 						{loading ? <IonSpinner name="dots" /> : 'Iniciar sesión'}
 					</IonButton>
+					<p style={{ color: '#8a9691', fontSize: '0.72rem', margin: '1rem 0 0', textAlign: 'center' }}>Conectado a MyCoins · {API_BASE_URL.replace('http://127.0.0.1:3000', 'servidor local')}</p>
+					</div>
 				</div>
 			</IonContent>
 		</IonPage>

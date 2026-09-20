@@ -9,7 +9,7 @@ const config: CapacitorConfig = {
 	// en vez de servir los archivos empaquetados en `dist/`. Se activa solo pasando
 	// `--live-reload` a `ionic cap run`; en build de producción esta sección no aplica.
 	server: {
-		androidScheme: 'https',
+		androidScheme: 'http',
 	},
 };
 
