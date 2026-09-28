@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://127.0.0.1:3000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:3000';
 
 export class ApiError extends Error {
 	constructor(
@@ -88,9 +88,7 @@ export const mobileLogin = async (username: string, password: string): Promise<s
 };
 
 /**
- * Solicitud de ejemplo hacia un endpoint propio, autenticada con el token de
- * sesión. Esto es lo que el taller pide demostrar: "una solicitud exitosa
- * hacia un endpoint de su propio backend".
+ * Recupera la sesión autenticada antes de cargar la información financiera personal.
  */
 export const fetchSession = async (sessionToken: string): Promise<SessionUser> => {
 	const response = await fetch(`${API_BASE_URL}/api/auth/session`, {

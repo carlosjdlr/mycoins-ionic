@@ -18,8 +18,8 @@ import {
 	IonSelectOption,
 } from '@ionic/react';
 import { createFinanceAccount, createFinanceCategory, createFinanceTransaction, fetchFinanceAccounts, fetchFinanceCategories, fetchFinanceSummary, fetchFinanceTransactions, logout as apiLogout, type FinanceAccount, type FinanceCategory, type FinanceSummary, type FinanceTransaction, ApiError } from '../services/api';
-import { checkLocationPermission, checkNotificationPermission, getCurrentLocation, requestLocationPermission, requestNotificationPermission, scheduleReminder, type PermissionState } from '../services/native';
-import { clearSessionToken, getSessionToken, saveLastKnownLocation, savePermissionStatus } from '../services/storage';
+import { checkNotificationPermission, requestNotificationPermission, scheduleReminder, type PermissionState } from '../services/native';
+import { clearSessionToken, getSessionToken, savePermissionStatus } from '../services/storage';
 
 type HomePageProps = {
 	onLoggedOut: () => void;
@@ -32,7 +32,6 @@ const HomePage = ({ onLoggedOut }: HomePageProps): JSX.Element => {
 	const [categories, setCategories] = useState<FinanceCategory[]>([]);
 	const [error, setError] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
-	const [locationPermission, setLocationPermission] = useState<PermissionState>('unknown');
 	const [notificationPermission, setNotificationPermission] = useState<PermissionState>('unknown');
 	const [nativeMessage, setNativeMessage] = useState('');
 	const [showAccountForm, setShowAccountForm] = useState(false);
@@ -57,8 +56,7 @@ const HomePage = ({ onLoggedOut }: HomePageProps): JSX.Element => {
 			}
 
 			try {
-				const [locationStatus, notificationStatus] = await Promise.all([checkLocationPermission(), checkNotificationPermission()]);
-				setLocationPermission(locationStatus);
+				const notificationStatus = await checkNotificationPermission();
 				setNotificationPermission(notificationStatus);
 				const [financeSummary, financeAccounts, financeCategories, financeTransactions] = await Promise.all([
 					fetchFinanceSummary(token),
@@ -163,35 +161,10 @@ const HomePage = ({ onLoggedOut }: HomePageProps): JSX.Element => {
 		}
 	};
 
-	const handleLocation = async (): Promise<void> => {
-		setNativeMessage('Solicitando ubicación...');
-		const permission = await requestLocationPermission();
-		await savePermissionStatus('location', permission);
-		setLocationPermission(permission);
-		if (permission !== 'granted') {
-			setNativeMessage('La ubicación no fue autorizada.');
-			return;
-		}
-
-		const current = await getCurrentLocation();
-		if (!current) {
-			setNativeMessage('No se pudo obtener la ubicación actual.');
-			return;
-		}
-
-		await saveLastKnownLocation({
-			latitude: current.coords.latitude,
-			longitude: current.coords.longitude,
-			accuracy: current.coords.accuracy,
-			capturedAt: new Date().toISOString(),
-		});
-		setNativeMessage(`Ubicación capturada: ${current.coords.latitude.toFixed(4)}, ${current.coords.longitude.toFixed(4)}`);
-	};
-
 	const handleNotification = async (): Promise<void> => {
 		setNativeMessage('Solicitando notificaciones...');
 		const permission = await requestNotificationPermission();
-		await savePermissionStatus('notifications', permission);
+		await savePermissionStatus(permission);
 		setNotificationPermission(permission);
 		if (permission !== 'granted') {
 			setNativeMessage('Las notificaciones no fueron autorizadas.');
@@ -299,13 +272,10 @@ const HomePage = ({ onLoggedOut }: HomePageProps): JSX.Element => {
 						</IonCard>
 
 						<IonCard style={{ margin: '1rem 0' }}>
-							<IonCardHeader><IonCardTitle>Funciones del dispositivo</IonCardTitle></IonCardHeader>
+							<IonCardHeader><IonCardTitle>Recordatorios financieros</IonCardTitle></IonCardHeader>
 							<IonCardContent>
-								<p style={{ color: '#65736e', marginTop: 0 }}>Usa funciones nativas para complementar tu control financiero.</p>
-								<div style={{ display: 'grid', gap: '0.7rem' }}>
-									<IonButton fill="outline" onClick={handleLocation}>Usar ubicación · {locationPermission}</IonButton>
-									<IonButton fill="outline" onClick={handleNotification}>Recordatorio financiero · {notificationPermission}</IonButton>
-								</div>
+											<p style={{ color: '#65736e', marginTop: 0 }}>Activa un aviso para acordarte de revisar tus gastos.</p>
+											<IonButton fill="outline" onClick={handleNotification}>Programar recordatorio · {notificationPermission}</IonButton>
 								{nativeMessage && <p style={{ color: '#0f766e', fontSize: '0.9rem', marginBottom: 0 }}>{nativeMessage}</p>}
 							</IonCardContent>
 						</IonCard>
